@@ -1,0 +1,1 @@
+export GOOGLE_APPLICATION_CREDENTIALS="/home/ricky/Documentos/Book change web/Book change web/Books Change/API-Firebase/book-change-api-firebase-adminsdk-tn4m3-72e085f07d.json"
