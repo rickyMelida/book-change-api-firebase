@@ -1,1 +1,7 @@
-export GOOGLE_APPLICATION_CREDENTIALS="/home/ricky/Documentos/Book change web/Book change web/Books Change/API-Firebase/book-change-api-firebase-adminsdk-tn4m3-72e085f07d.json"
+# API Book Change By Firebase 
+
+API created using NodeJS as Stack and Firebase as main service.
+
+This API return the basic end point that the Book Change App need.
+
+It is still working for a more solid documentation
