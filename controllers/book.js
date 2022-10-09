@@ -1,12 +1,16 @@
 const { firestoreAdmin } = require("../services/firebase-admin-service");
 const Book = {
-  getBooks: (req, res) => {
-    firestoreAdmin
-      .collection("users")
-      .get()
-      .forEach((doc) => {
-        res.send({ data: doc.data() });
-      });
+  getBooks: async(req, res) => {
+    try {
+      const querySnapshot = await firestoreAdmin.collection('book').get();
+      const books = querySnapshot.docs.map((doc) =>({
+        id: doc.id,
+        ...doc.data()
+      }));
+      res.status(200).send({books})
+    } catch (error) {
+      res.status(500).send({error})
+    }
   },
 
   getBookById: (req, res) => {
