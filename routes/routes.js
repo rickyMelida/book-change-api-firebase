@@ -6,7 +6,7 @@ const userRoutes = require('./user');
 
 const router = express();
 
-router.use('/books', bookRouter);
+router.use('/book', bookRouter);
 router.use('/auth', authRouter);
 router.use('/user', userRoutes);
 
