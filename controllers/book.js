@@ -1,20 +1,31 @@
 const { firestoreAdmin } = require("../services/firebase-admin-service");
 const Book = {
-  getBooks: async(req, res) => {
+  getBooks: async (req, res) => {
     try {
-      const querySnapshot = await firestoreAdmin.collection('book').get();
-      const books = querySnapshot.docs.map((doc) =>({
+      const querySnapshot = await firestoreAdmin.collection("book").get();
+      const books = querySnapshot.docs.map((doc) => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
       }));
-      res.status(200).send({books})
+      return res.status(200).send({ books });
     } catch (error) {
-      res.status(500).send({error})
+      return res.status(500).send({ error });
     }
   },
 
-  getBookById: (req, res) => {
-    res.send("getBook");
+  getBookById: async (req, res) => {
+    const { uid } = req.params;
+
+    try {
+      const bookByUid = await firestoreAdmin.collection("book").doc(uid).get();
+
+      if (bookByUid.data() == null || bookByUid.data() == "")
+        return res.status(404).send({ data: "No Data" });
+
+      return res.status(200).send(bookByUid.data());
+    } catch (error) {
+      return res.status(500).send({ error: error });
+    }
   },
 
   getFavouriteBooks: (req, res) => {

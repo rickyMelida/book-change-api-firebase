@@ -7,7 +7,7 @@ const multipart = require("connect-multiparty");
 const mdUpload = multipart({ uploadDir: "./upload" });
 
 router.get("/", bookController.getBooks);
-router.get("/:id", bookController.getBookById);
+router.get("/:uid", bookController.getBookById);
 router.get("/favourite/:id", bookController.getFavouriteBooks);
 router.get("/my/:id", bookController.getMyBooks);
 router.post("/", mdUpload, bookController.setBook);
