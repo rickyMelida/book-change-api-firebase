@@ -3,3 +3,4 @@ node_modules
 firebase-credentials.json
 firebase.json
 credentials.txt
+firebase-admin.json
