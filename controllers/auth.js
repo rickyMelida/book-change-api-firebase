@@ -1,5 +1,6 @@
 const { authAdmin } = require("../services/firebase-admin-service");
 const { auth } = require("../services/firebase-service");
+
 const {
   signInWithEmailAndPassword,
   getAuth,
@@ -37,14 +38,9 @@ const signIn = (req, res) => {
 
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
-      sendMailVerification(getAuth().currentUser)
-        .then(() => res.status(200).send({ userData: userCredential.user }))
-        .catch((errEmail) =>
-          res.status(400).send({
-            error: errEmail,
-            message: "Error al enviar mensaje de verificacion",
-          })
-        );
+      res.cookie("user-uid", userCredential.user.uid);
+      res.status(200).send({ userData: userCredential.user });
+      console.log(userCredential.user);
     })
     .catch((error) =>
       res
@@ -54,12 +50,11 @@ const signIn = (req, res) => {
 };
 
 const sendMailVerification = async (userRegisterd) => {
-  await sendEmailVerification(userRegisterd)
-    
+  await sendEmailVerification(userRegisterd);
 };
 
 const logOut = (req, res) => {
-  res.send("logout");
+  res.clearCookie("user-uid");
 };
 
 module.exports = { signIn, signUp, logOut };
