@@ -40,7 +40,6 @@ const signIn = (req, res) => {
     .then((userCredential) => {
       res.cookie("user-uid", userCredential.user.uid);
       res.status(200).send({ userData: userCredential.user });
-      console.log(userCredential.user);
     })
     .catch((error) =>
       res
@@ -57,4 +56,14 @@ const logOut = (req, res) => {
   res.clearCookie("user-uid");
 };
 
-module.exports = { signIn, signUp, logOut };
+const verifyAuth = (req, res) => {
+  const user = auth.currentUser;
+
+  if (user)
+    return res.status(200).send({ status: '200', userData: user });
+
+  return res.status(401).send({ status: '401', message: 'Usuario no autenticado' });
+
+}
+
+module.exports = { signIn, signUp, logOut, verifyAuth };
