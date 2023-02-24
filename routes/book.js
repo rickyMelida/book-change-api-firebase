@@ -8,7 +8,8 @@ const {
   setBook,
   getBookByUserOwner,
   getRecentsBooks,
-  getFeaturedBooks
+  getFeaturedBooks,
+  getothersBooks
 } = require("../controllers/book");
 
 const multipart = require("connect-multiparty");
@@ -22,5 +23,6 @@ router.get("/my/:id", getMyBooks);
 router.post("/set-book", mdUpload, setBook);
 router.get("/getRecents/:amount", getRecentsBooks);
 router.get("/getFeaturedBooks/:amount", getFeaturedBooks);
+router.get("/getothersBooks/:amount", getothersBooks);
 
 module.exports = router;

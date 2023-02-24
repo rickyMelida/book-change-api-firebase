@@ -1,6 +1,7 @@
 const utils = require("../utils/utils");
 const { firestoreAdmin } = require("../services/firebase-admin-service");
 const { app } = require("../services/firebase-service");
+const { v4: uuid } = require("uuid");
 const {
   getFirestore,
   query,
@@ -10,7 +11,6 @@ const {
   orderBy,
   limit,
 } = require("firebase/firestore");
-const { v4: uuid } = require("uuid");
 
 const getBooks = async (req, res) => {
   try {
@@ -150,6 +150,37 @@ const getRecentsBooks = (req, res) => {
     });
 };
 
+const getOthersData = async (amount) => {
+  const db = getFirestore(app);
+
+  const q = query(
+    collection(db, "book"),
+    orderBy("uploadDate", "asc"),
+    limit(amount)
+  );
+
+  return await getDocs(q);
+};
+
+const getothersBooks = (req, res) => {
+  const amount = req.params.amount;
+  const dataLimit = amount.split("=")[1];
+  const dataResult = [];
+
+  getOthersData(dataLimit)
+    .then((data) => {
+      if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+
+      data.forEach((doc) => dataResult.push(doc.data()));
+
+      return res.status(200).send({ message: "success", data: dataResult });
+    })
+    .catch((err) => {
+      return res.status(500).send({ message: "Error al traer los datos" });
+    });
+};
+
+
 module.exports = {
   getBooks,
   getBookById,
@@ -158,5 +189,6 @@ module.exports = {
   setBook,
   getBookByUserOwner,
   getRecentsBooks,
-  getFeaturedBooks
+  getFeaturedBooks,
+  getothersBooks
 };
