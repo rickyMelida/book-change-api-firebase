@@ -61,7 +61,7 @@ const getBookByUserOwner = (req, res) => {
       if ((data.size = 0)) return res.status(204).send({ message: "No data" });
 
       data.forEach((doc) => bookData.push(doc.data()));
-      return res.status(200).send({ message: "success", data: bookData });
+      return res.status(200).send({ bookData });
     })
     .catch((err) => {
       return res.status(500).send({ message: "Error al traer los datos" });
@@ -113,7 +113,7 @@ const getFeaturedBooks = (req, res) => {
 
       data.forEach((doc) => dataResult.push(doc.data()));
 
-      return res.status(200).send({ message: "success", data: dataResult });
+      return res.status(200).send(dataResult);
     })
     .catch((err) => {
       return res.status(500).send({ message: "Error al traer los datos" });
@@ -143,7 +143,7 @@ const getRecentsBooks = (req, res) => {
 
       data.forEach((doc) => dataResult.push(doc.data()));
 
-      return res.status(200).send({ message: "success", data: dataResult });
+      return res.status(200).send(dataResult);
     })
     .catch((err) => {
       return res.status(500).send({ message: "Error al traer los datos" });
@@ -173,13 +173,13 @@ const getothersBooks = (req, res) => {
 
       data.forEach((doc) => dataResult.push(doc.data()));
 
-      return res.status(200).send({ message: "success", data: dataResult });
+      return res.status(200).send(dataResult);
     })
     .catch((err) => {
+      console.log(err);
       return res.status(500).send({ message: "Error al traer los datos" });
     });
 };
-
 
 module.exports = {
   getBooks,
@@ -190,5 +190,5 @@ module.exports = {
   getBookByUserOwner,
   getRecentsBooks,
   getFeaturedBooks,
-  getothersBooks
+  getothersBooks,
 };
