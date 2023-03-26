@@ -19,28 +19,38 @@ const getBooks = async (req, res) => {
       id: doc.id,
       ...doc.data(),
     }));
-    return res.status(200).send({ books });
+    return res.status(200).send(books);
   } catch (error) {
     return res.status(500).send({ error });
   }
 };
 
-const getBookById = async (req, res) => {
+const getDataById = async (params) => {
+  const db = getFirestore(app);
+  const uid = params.split("=")[1];
+
+  const q = query(collection(db, "book"), where("uid", "==", uid));
+
+  return await getDocs(q);
+};
+
+const getBookById = (req, res) => {
   const { uid } = req.params;
+  let bookData = {};
 
-  try {
-    const bookByUid = await firestoreAdmin
-      .collection("book")
-      .doc(uid.split("=")[1])
-      .get();
+  getDataById(uid)
+    .then((data) => {
+      if ((data.size = 0)) return res.status(204).send({ message: "No data" });
 
-    if (bookByUid.data() == null || bookByUid.data() == "")
-      return res.status(404).send({ data: "No Data" });
-
-    return res.status(200).send(bookByUid.data());
-  } catch (error) {
-    return res.status(500).send({ error: error });
-  }
+      data.forEach((doc) => {
+        bookData = doc.data();
+        
+      });
+      return res.status(200).send(bookData);
+    })
+    .catch((err) => {
+      return res.status(500).send({ message: "Error al traer los datos" });
+    });
 };
 
 const getDataByUserOwner = async (params) => {
@@ -176,7 +186,6 @@ const getothersBooks = (req, res) => {
       return res.status(200).send(dataResult);
     })
     .catch((err) => {
-      console.log(err);
       return res.status(500).send({ message: "Error al traer los datos" });
     });
 };
