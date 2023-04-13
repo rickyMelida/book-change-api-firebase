@@ -1,10 +1,10 @@
 const { authAdmin } = require("../services/firebase-admin-service");
 const { auth } = require("../services/firebase-service");
-
 const {
   signInWithEmailAndPassword,
   getAuth,
   sendEmailVerification,
+  signOut,
 } = require("firebase/auth");
 
 const signUp = (req, res) => {
@@ -53,17 +53,26 @@ const sendMailVerification = async (userRegisterd) => {
 };
 
 const logOut = (req, res) => {
-  res.clearCookie("user-uid");
+  const authentication = getAuth();
+  signOut(authentication)
+    .then(() => {
+      res.status(200).send({ message: "Cierre de sesion exitoso." });
+    })
+    .catch((err) => {
+      res
+        .status(500)
+        .send({ message: "Hubo un error al intentar cerrar la sesion" });
+    });
 };
 
 const verifyAuth = (req, res) => {
   const user = auth.currentUser;
 
-  if (user)
-    return res.status(200).send({ status: '200', userData: user });
+  if (user) return res.status(200).send({ status: "200", userData: user });
 
-  return res.status(401).send({ status: '401', message: 'Usuario no autenticado' });
-
-}
+  return res
+    .status(401)
+    .send({ status: "401", message: "Usuario no autenticado" });
+};
 
 module.exports = { signIn, signUp, logOut, verifyAuth };
