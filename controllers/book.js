@@ -190,6 +190,20 @@ const getothersBooks = (req, res) => {
     });
 };
 
+
+const getSearchResult = async (word) =>{
+  const db = getFirestore(app);
+  const uid = params.split("=")[1];
+
+  const q = query(collection(db, "book"), where("userId", "==", uid));
+
+  return await getDocs(q);
+}
+
+const findBook = (req, res) => {
+  console.log(req.body);
+}
+
 module.exports = {
   getBooks,
   getBookById,
@@ -200,4 +214,5 @@ module.exports = {
   getRecentsBooks,
   getFeaturedBooks,
   getothersBooks,
+  findBook
 };

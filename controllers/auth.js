@@ -1,10 +1,12 @@
 const { authAdmin } = require("../services/firebase-admin-service");
 const { auth } = require("../services/firebase-service");
+const cookieParser = require("cookie-parser");
 const {
   signInWithEmailAndPassword,
   getAuth,
   sendEmailVerification,
   signOut,
+  onAuthStateChanged,
 } = require("firebase/auth");
 
 const signUp = (req, res) => {
@@ -39,7 +41,7 @@ const signIn = (req, res) => {
   signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       res.cookie("user-uid", userCredential.user.uid);
-      res.status(200).send({ userData: userCredential.user });
+      res.status(200).send(userCredential.user);
     })
     .catch((error) =>
       res
@@ -65,14 +67,34 @@ const logOut = (req, res) => {
     });
 };
 
-const verifyAuth = (req, res) => {
-  const user = auth.currentUser;
+const verifyAuth = async (uidRequest) => {
+  let uid = null;
+  let userInfo = {};
 
-  if (user) return res.status(200).send({ status: "200", userData: user });
+  return new Promise((resolve, reject) => {
+    const unsuscribe = onAuthStateChanged(
+      auth,
+      (user) => {
+        if (!user) resolve({ message: "Usuario no autenticado" });
 
-  return res
-    .status(401)
-    .send({ status: "401", message: "Usuario no autenticado" });
+        resolve(user);
+        unsuscribe();
+      },
+      (error) => {
+        reject(error);
+      }
+    );
+  });
 };
 
-module.exports = { signIn, signUp, logOut, verifyAuth };
+const isAuth = async (req, res) => {
+  const uidRequest = req.params.uid;
+  try {
+    const user = await verifyAuth(uidRequest);
+    return res.status(200).send(user);
+  } catch (err) {
+    return res.status(500).send({ message: err });
+  }
+};
+
+module.exports = { signIn, signUp, logOut, isAuth };
