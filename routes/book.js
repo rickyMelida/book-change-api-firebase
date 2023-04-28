@@ -2,14 +2,14 @@ const express = require("express");
 const router = express.Router();
 const {
   getBooks,
-  getBookById,
+  getBook,
   getFavouriteBooks,
   getMyBooks,
   setBook,
   getBookByUserOwner,
   getRecentsBooks,
   getFeaturedBooks,
-  getothersBooks,
+  getOthersBooks,
   findBook,
 } = require("../controllers/book");
 
@@ -37,7 +37,7 @@ const mdUpload = multipart({ uploadDir: "./upload" });
  *       500:
  *         description: Error en el servidor
  */
-router.get("/", getBooks);
+router.get("/book", getBooks);
 
 /**
  * @swagger
@@ -46,7 +46,7 @@ router.get("/", getBooks);
  *     tags: [Libros]
  *     description: Obtiene un libro por su UID
  *     parameters:
- *       - name: id
+ *       - name: uid
  *         in: path
  *         description: UID del libro a buscar
  *         required: true
@@ -59,7 +59,7 @@ router.get("/", getBooks);
  *       500:
  *         description: Error en el servidor
  */
-router.get("/:uid", getBookById);
+router.get("/book/:uid", getBook);
 
 /**
  * @swagger
@@ -68,7 +68,7 @@ router.get("/:uid", getBookById);
  *     tags: [Libros]
  *     description: Obtiene un libro por el UID del Usuario
  *     parameters:
- *       - name: id
+ *       - name: uid
  *         in: path
  *         description: UID del libro a buscar
  *         required: true
@@ -81,16 +81,16 @@ router.get("/:uid", getBookById);
  *       500:
  *         description: Error en el servidor
  */
-router.get("/byUser/:uid", getBookByUserOwner);
+router.get("/book/byUser/:uid", getBookByUserOwner);
 
 /**
  * @swagger
- * /api/book/favourite/{id}:
+ * /api/book/favourite/{uid}:
  *   get:
  *     tags: [Libros]
  *     description: Obtiene un libro por id marcado como favorito.
  *     parameters:
- *       - name: id
+ *       - name: uid
  *         in: path
  *         description: ID del libro a buscar
  *         required: true
@@ -103,7 +103,7 @@ router.get("/byUser/:uid", getBookByUserOwner);
  *       500:
  *         description: Error en el servidor
  */
-router.get("/favourite/:id", getFavouriteBooks);
+router.get("/book/favourite/:id", getFavouriteBooks);
 
 
 /**
@@ -126,7 +126,7 @@ router.get("/favourite/:id", getFavouriteBooks);
  *       500:
  *         description: Error en el servidor
  */
-router.get("/my/:id", getMyBooks);
+router.get("/book/my/:id", getMyBooks);
 
 /**
  * @swagger
@@ -142,14 +142,20 @@ router.get("/my/:id", getMyBooks);
  *       500:
  *         description: Error en el servidor
  */
-router.post("/set-book", mdUpload, setBook);
+router.post("/book/set-book", mdUpload, setBook);
 
 /**
  * @swagger
- * /api/book/getRecents/:amount:
+ * /api/book/getRecents/{amount}:
  *   get:
  *     tags: [Libros]
  *     description: Obtenemos una cantidad n de libros recien subidos
+ *     parameters:
+ *       - name: amount
+ *         in: path
+ *         description: Cantidad de datos a devolver
+ *         required: true
+ *         type: number
  *     responses:
  *       200:
  *         description: Libro encontrado 
@@ -158,14 +164,20 @@ router.post("/set-book", mdUpload, setBook);
  *       500:
  *         description: Error en el servidor
  */
-router.get("/getRecents/:amount", getRecentsBooks);
+router.get("/book/getRecents/:amount", getRecentsBooks);
 
 /**
  * @swagger
- * /api/book/getFeaturedBooks/:amount:
+ * /api/book/getFeaturedBooks/{amount}:
  *   get:
  *     tags: [Libros]
  *     description: Obtenemos una cantidad n de libros relevantes
+ *     parameters:
+ *       - name: amount
+ *         in: path
+ *         description: Cantidad de datos a devolver
+ *         required: true
+ *         type: number
  *     responses:
  *       200:
  *         description: Libro encontrado 
@@ -174,15 +186,21 @@ router.get("/getRecents/:amount", getRecentsBooks);
  *       500:
  *         description: Error en el servidor
  */
-router.get("/getFeaturedBooks/:amount", getFeaturedBooks);
+router.get("/book/getFeaturedBooks/:amount", getFeaturedBooks);
 
 
 /**
  * @swagger
- * /api/book/getothersBooks/:amount:
+ * /api/book/getOthersBooks/{amount}:
  *   get:
  *     tags: [Libros]
- *     description: Obtenemos una cantidad n de otros libros que no sean muy relevantes ni recientes 
+ *     description: Obtenemos una cantidad n de otros libros que no sean muy relevantes ni recientes
+ *     parameters:
+ *       - name: amount
+ *         in: path
+ *         description: Cantidad de datos a devolver
+ *         required: true
+ *         type: number 
  *     responses:
  *       200:
  *         description: Libro encontrado 
@@ -191,7 +209,7 @@ router.get("/getFeaturedBooks/:amount", getFeaturedBooks);
  *       500:
  *         description: Error en el servidor
  */
-router.get("/getothersBooks/:amount", getothersBooks);
+router.get("/book/getOthersBooks/:amount", getOthersBooks);
 
 /**
  * @swagger
@@ -212,6 +230,6 @@ router.get("/getothersBooks/:amount", getothersBooks);
  *       500:
  *         description: Error en el servidor
  */
-router.post("/find", findBook);
+router.post("/book/find", findBook);
 
 module.exports = router;
