@@ -25,57 +25,48 @@ const getBooks = async (req, res) => {
   }
 };
 
-const getDataById = async (params) => {
-  const db = getFirestore(app);
-  const uid = params.split("=")[1];
-
-  const q = query(collection(db, "book"), where("uid", "==", uid));
-
-  return await getDocs(q);
-};
-
-const getBookById = (req, res) => {
+const getBook = async (req, res) => {
   const { uid } = req.params;
   let bookData = {};
 
-  getDataById(uid)
-    .then((data) => {
-      if ((data.size = 0)) return res.status(204).send({ message: "No data" });
-
-      data.forEach((doc) => {
-        bookData = doc.data();
-        
-      });
-      return res.status(200).send(bookData);
-    })
-    .catch((err) => {
-      return res.status(500).send({ message: "Error al traer los datos" });
-    });
-};
-
-const getDataByUserOwner = async (params) => {
   const db = getFirestore(app);
-  const uid = params.split("=")[1];
 
-  const q = query(collection(db, "book"), where("userId", "==", uid));
+  try {
+    const q = query(collection(db, "book"), where("uid", "==", uid));
+    const data = await getDocs(q);
 
-  return await getDocs(q);
+    if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+
+    data.forEach((doc) => {
+      bookData = doc.data();
+    });
+
+    return await res.status(200).send(bookData);
+  } catch (err) {
+    return await res.status(500).send({ message: "Error al traer los datos" });
+  }
 };
 
-const getBookByUserOwner = (req, res) => {
+const getBookByUserOwner = async (req, res) => {
   const { uid } = req.params;
   let bookData = [];
 
-  getDataByUserOwner(uid)
-    .then((data) => {
-      if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+  console.log(uid);
 
-      data.forEach((doc) => bookData.push(doc.data()));
-      return res.status(200).send({ bookData });
-    })
-    .catch((err) => {
-      return res.status(500).send({ message: "Error al traer los datos" });
+  const db = getFirestore(app);
+  try {
+    const q = query(collection(db, "book"), where("userId", "==", uid));
+    const data = await getDocs(q);
+    if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+
+    data.forEach((doc) => {
+      bookData.push(doc.data());
     });
+
+    return await res.status(200).send(bookData);
+  } catch (error) {
+    return res.status(500).send({ message: "Error al traer los datos" });
+  }
 };
 
 const getFavouriteBooks = (req, res) => {
@@ -100,119 +91,97 @@ const setBook = async (req, res) => {
   }
 };
 
-const getFeaturedData = async (amount) => {
+const getFeaturedBooks = async (req, res) => {
+  const { amount } = req.params;
+  const dataResult = [];
   const db = getFirestore(app);
 
-  const q = query(
-    collection(db, "book"),
-    orderBy("year", "desc"),
-    limit(amount)
-  );
+  try {
+    const q = query(
+      collection(db, "book"),
+      orderBy("year", "desc"),
+      limit(amount)
+    );
+    const data = await getDocs(q);
+    if ((data.size = 0)) return res.status(204).send({ message: "No data" });
 
-  return await getDocs(q);
+    data.forEach((doc) => dataResult.push(doc.data()));
+
+    return res.status(200).send(dataResult);
+  } catch (error) {
+    return res.status(500).send({ message: "Error al traer los datos" });
+  }
 };
 
-const getFeaturedBooks = (req, res) => {
-  const amount = req.params.amount;
-  const dataLimit = amount.split("=")[1];
+const getRecentsBooks = async (req, res) => {
+  const { amount } = req.params;
   const dataResult = [];
-
-  getFeaturedData(dataLimit)
-    .then((data) => {
-      if ((data.size = 0)) return res.status(204).send({ message: "No data" });
-
-      data.forEach((doc) => dataResult.push(doc.data()));
-
-      return res.status(200).send(dataResult);
-    })
-    .catch((err) => {
-      return res.status(500).send({ message: "Error al traer los datos" });
-    });
-};
-
-const getRecentData = async (amount) => {
   const db = getFirestore(app);
 
-  const q = query(
-    collection(db, "book"),
-    orderBy("uploadDate", "desc"),
-    limit(amount)
-  );
+  try {
+    const q = query(
+      collection(db, "book"),
+      orderBy("uploadDate", "desc"),
+      limit(amount)
+    );
+    const data = await getDocs(q);
 
-  return await getDocs(q);
+    if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+
+    data.forEach((doc) => dataResult.push(doc.data()));
+
+    return res.status(200).send(dataResult);
+  } catch (error) {
+    return res.status(500).send({ message: "Error al traer los datos" });
+  }
 };
 
-const getRecentsBooks = (req, res) => {
-  const amount = req.params.amount;
-  const dataLimit = amount.split("=")[1];
+const getOthersBooks = async (req, res) => {
+  const { amount } = req.params;
   const dataResult = [];
-
-  getRecentData(dataLimit)
-    .then((data) => {
-      if ((data.size = 0)) return res.status(204).send({ message: "No data" });
-
-      data.forEach((doc) => dataResult.push(doc.data()));
-
-      return res.status(200).send(dataResult);
-    })
-    .catch((err) => {
-      return res.status(500).send({ message: "Error al traer los datos" });
-    });
-};
-
-const getOthersData = async (amount) => {
   const db = getFirestore(app);
 
-  const q = query(
-    collection(db, "book"),
-    orderBy("uploadDate", "asc"),
-    limit(amount)
-  );
+  try {
+    const q = query(
+      collection(db, "book"),
+      orderBy("uploadDate", "asc"),
+      limit(amount)
+    );
 
-  return await getDocs(q);
+    const data = await getDocs(q);
+    if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+
+    data.forEach((doc) => dataResult.push(doc.data()));
+
+    return res.status(200).send(dataResult);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send({ message: "Error al traer los datos" });
+  }
 };
 
-const getothersBooks = (req, res) => {
-  const amount = req.params.amount;
-  const dataLimit = amount.split("=")[1];
-  const dataResult = [];
-
-  getOthersData(dataLimit)
-    .then((data) => {
-      if ((data.size = 0)) return res.status(204).send({ message: "No data" });
-
-      data.forEach((doc) => dataResult.push(doc.data()));
-
-      return res.status(200).send(dataResult);
-    })
-    .catch((err) => {
-      return res.status(500).send({ message: "Error al traer los datos" });
-    });
-};
-
-
-const getSearchResult = async (word) =>{
+const getSearchResult = async (word) => {
   const db = getFirestore(app);
   const uid = params.split("=")[1];
 
   const q = query(collection(db, "book"), where("userId", "==", uid));
 
   return await getDocs(q);
-}
+};
 
 const findBook = (req, res) => {
   console.log(req.body);
-}
+};
 
 module.exports = {
   getBooks,
-  getBookById,
+  getBook,
   getFavouriteBooks,
   getMyBooks,
   setBook,
   getBookByUserOwner,
   getRecentsBooks,
   getFeaturedBooks,
-  getothersBooks,
-  findBook
+  getOthersBooks,
+  findBook,
 };

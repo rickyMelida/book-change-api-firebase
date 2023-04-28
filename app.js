@@ -1,8 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const bookRouter = require('./routes/routes');
 const cookieParser = require('cookie-parser');
+const bookRouter = require('./routes/book');
 
 const app = express();
 
@@ -21,5 +21,4 @@ app.use((req, res, next) => {
 });
 
 app.use('/api', bookRouter);
-
 module.exports = app;
