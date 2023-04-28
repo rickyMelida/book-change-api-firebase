@@ -88,9 +88,10 @@ const verifyAuth = async (uidRequest) => {
 };
 
 const isAuth = async (req, res) => {
-  const uidRequest = req.params.uid;
+  const { uid } = req.params;
+
   try {
-    const user = await verifyAuth(uidRequest);
+    const user = await verifyAuth(uid);
     return res.status(200).send(user);
   } catch (err) {
     return res.status(500).send({ message: err });

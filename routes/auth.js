@@ -29,7 +29,7 @@ const router = express.Router();
  *       500:
  *         description: Error en el servidor
  */
-router.get('/:uid', auth.isAuth);
+router.get('/auth/:uid', auth.isAuth);
 
 /**
  * @swagger
@@ -76,7 +76,7 @@ router.get('/:uid', auth.isAuth);
  *       500:
  *         description: Error en el servidor
  */
-router.post('/signup', auth.signUp);
+router.post('/auth/signup', auth.signUp);
 
 /**
  * @swagger
@@ -105,7 +105,7 @@ router.post('/signup', auth.signUp);
  *       500:
  *         description: Error en el servidor
  */
-router.post('/signin', auth.signIn);
+router.post('/auth/signin', auth.signIn);
 
 /**
  * @swagger
@@ -121,6 +121,6 @@ router.post('/signin', auth.signIn);
  *       500:
  *         description: Error en el servidor
  */
-router.post('/signout', auth.logOut);
+router.post('/auth/signout', auth.logOut);
 
 module.exports = router;
