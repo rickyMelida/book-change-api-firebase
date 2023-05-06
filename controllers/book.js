@@ -51,8 +51,6 @@ const getBookByUserOwner = async (req, res) => {
   const { uid } = req.params;
   let bookData = [];
 
-  console.log(uid);
-
   const db = getFirestore(app);
   try {
     const q = query(collection(db, "book"), where("userId", "==", uid));
@@ -155,7 +153,6 @@ const getOthersBooks = async (req, res) => {
 
     return res.status(200).send(dataResult);
   } catch (error) {
-    console.log(error);
     return res.status(500).send({ message: "Error al traer los datos" });
   }
 };
@@ -170,7 +167,7 @@ const getSearchResult = async (word) => {
 };
 
 const findBook = (req, res) => {
-  console.log(req.body);
+  return { message: "findBook Controller" };
 };
 
 module.exports = {

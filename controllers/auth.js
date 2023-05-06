@@ -68,17 +68,19 @@ const logOut = (req, res) => {
 };
 
 const verifyAuth = async (uidRequest) => {
-  let uid = null;
-  let userInfo = {};
-
   return new Promise((resolve, reject) => {
     const unsuscribe = onAuthStateChanged(
       auth,
       (user) => {
-        if (!user) resolve({ message: "Usuario no autenticado" });
-
-        resolve(user);
-        unsuscribe();
+        try {
+          if (!user) resolve({ message: "Usuario no autenticado" });
+          const { uid } = user;
+          if (uid === uidRequest) resolve(user);
+          else resolve({ message: "Usuario no autenticado" });
+          unsuscribe();
+        } catch (err) {
+          resolve({ message: "Usuario no autenticado" });
+        }
       },
       (error) => {
         reject(error);
