@@ -1,13 +1,14 @@
-const { authAdmin } = require("../services/firebase-admin-service");
+const { authAdmin, admin } = require("../services/firebase-admin-service");
 const { auth } = require("../services/firebase-service");
-const cookieParser = require("cookie-parser");
+const path = require("path");
+const nodemailer = require("nodemailer");
 const {
   signInWithEmailAndPassword,
   getAuth,
-  sendEmailVerification,
   signOut,
   onAuthStateChanged,
 } = require("firebase/auth");
+require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 
 const signUp = (req, res) => {
   try {
@@ -22,10 +23,64 @@ const signUp = (req, res) => {
         phoneNumber,
       })
       .then((rs) => {
-        return res.status(200).send({ Message: rs });
+        authAdmin
+          .getUserByEmail(email)
+          .then((userRecord) => {
+            return authAdmin.generateEmailVerificationLink(userRecord.email);
+          })
+          .then((link) => {
+            const mailOptions = {
+              from: "bookchange.admin@gmail.com",
+              to: email,
+              subject: "Verificación de correo electrónico",
+              html: `
+                <div>
+                  <p>
+                    Gracias por registrarte! <br />
+                    <p style='margin-bottom: 2%;'>
+                      Tu cuenta ha sido creada, puedes iniciar sesión con lo siguiente
+                      credenciales después de haber activado su cuenta presionando la url
+                      abajo.
+                    </p>
+                    <hr>
+                      Username: ${email} <br>
+                      Password: ${password} <br>
+                    <hr>
+                  </p>
+                  <p>
+                    Haga clic en este enlace para activar su cuenta:
+                  </p>
+                  <a href='${link}'>Verificar Correo</a>
+                </div>
+              `,
+            };
+
+            sendMailVerification(mailOptions)
+              .then((rm) => {
+                return res.status(200).send(rs);
+              })
+              .catch((err) => {
+                return res.status(500).send({
+                  message:
+                    "Hubo un error al enviar el correo de verificacion. Favor vuelva a intentar mas tarde.",
+                  err,
+                });
+              });
+          })
+          .catch((err) => {
+            return res.status(500).send({
+              message:
+                "Hubo un error al enviar el correo de verificacion. Favor vuelva a intentar mas tarde.",
+              err,
+            });
+          });
       })
       .catch((er) => {
-        return res.status(500).send({ Message: er });
+        return res.status(500).send({
+          message:
+            "Hubo un error al intentar registrarse. Favor vuelva a intentar mas tarde.",
+          err,
+        });
       });
   } catch (err) {
     return res.status(500).send({ message: `${err}` });
@@ -50,8 +105,19 @@ const signIn = (req, res) => {
     );
 };
 
-const sendMailVerification = async (userRegisterd) => {
-  await sendEmailVerification(userRegisterd);
+const sendMailVerification = async (message) => {
+  const config = {
+    host: "smtp.gmail.com",
+    port: 587,
+    auth: {
+      user: process.env.EMAIL_ADMIN,
+      pass: process.env.PASSWORD_ADMIN,
+    },
+  };
+
+  const transport = nodemailer.createTransport(config);
+
+  return await transport.sendMail(message);
 };
 
 const logOut = (req, res) => {
