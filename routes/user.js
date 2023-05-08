@@ -1,7 +1,7 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
-const {getUser} = require('../controllers/user');
+const { getUser } = require("../controllers/user");
 
 /**
  * @swagger
@@ -30,7 +30,6 @@ const {getUser} = require('../controllers/user');
  *       500:
  *         description: Error en el servidor
  */
-router.get('/:uid', getUser);
-
+router.get("/user/:uid", getUser);
 
 module.exports = router;

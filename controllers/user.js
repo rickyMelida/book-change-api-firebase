@@ -4,7 +4,7 @@ const getUser = (req, res) => {
   authAdmin
     .getUser(uid)
     .then((user) => {
-      res.status(200).send({ user });
+      res.status(200).send(user);
     })
     .catch((err) => {
       res.status(500).send({ err });
