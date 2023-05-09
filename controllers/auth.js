@@ -76,7 +76,7 @@ const signUp = (req, res) => {
             });
           });
       })
-      .catch((er) => {
+      .catch((err) => {
         return res.status(500).send({
           message:
             "Hubo un error al intentar registrarse. Favor vuelva a intentar mas tarde.",
