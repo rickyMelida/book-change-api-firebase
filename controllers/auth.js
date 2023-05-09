@@ -13,7 +13,7 @@ require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 const signUp = (req, res) => {
   try {
     const { email, password, displayName, photoURL, phoneNumber } = req.body;
-
+    auth.useDeviceLanguage();
     authAdmin
       .createUser({
         email,
@@ -29,6 +29,7 @@ const signUp = (req, res) => {
             return authAdmin.generateEmailVerificationLink(userRecord.email);
           })
           .then((link) => {
+            const spanishLink = link.replace("lang=en", "lang=es");
             const mailOptions = {
               from: "bookchange.admin@gmail.com",
               to: email,
@@ -50,7 +51,7 @@ const signUp = (req, res) => {
                   <p>
                     Haga clic en este enlace para activar su cuenta:
                   </p>
-                  <a href='${link}'>Verificar Correo</a>
+                  <a href='${spanishLink}'>Verificar Correo</a>
                 </div>
               `,
             };
