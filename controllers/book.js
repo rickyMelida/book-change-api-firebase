@@ -77,12 +77,14 @@ const getMyBooks = (req, res) => {
 
 const setBook = async (req, res) => {
   const bookData = req.body;
+  const uid = uuid();
+  const bookDetail = {...bookData, uid}
 
   try {
     const serverRespose = await firestoreAdmin
       .collection("book")
-      .doc(uuid())
-      .create(bookData);
+      .doc(uid)
+      .create(bookDetail);
     return res.status(200).send({ serverRespose });
   } catch (error) {
     return res.status(500).send({ error });
