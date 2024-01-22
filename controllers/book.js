@@ -1,69 +1,43 @@
-const utils = require("../utils/utils");
 const { firestoreAdmin } = require("../services/firebase-admin-service");
-const { app } = require("../services/firebase-service");
-const { v4: uuid } = require("uuid");
-const {
-  getFirestore,
-  query,
-  where,
-  collection,
-  getDocs,
-  orderBy,
-  limit,
-} = require("firebase/firestore");
+const { ApiResponse } = require("../utils/responses");
+const { bookService } = require("../services/book.service");
 
 const getBooks = async (req, res) => {
   try {
-    const querySnapshot = await firestoreAdmin.collection("book").get();
-    const books = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    return res.status(200).send(books);
+    const books = await bookService.getBooks();
+
+    if (books == null) return ApiResponse.NotContent(res);
+
+    return ApiResponse.OK(res, books);
   } catch (error) {
-    return res.status(500).send({ error });
+    return ApiResponse.InternalServerError(res);
   }
 };
 
 const getBook = async (req, res) => {
   const { uid } = req.params;
-  let bookData = {};
-
-  const db = getFirestore(app);
-
   try {
-    const q = query(collection(db, "book"), where("uid", "==", uid));
-    const data = await getDocs(q);
+    const book = await bookService.getBook(uid);
 
-    if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+    if (book == null) return ApiResponse.NotContent(res);
 
-    data.forEach((doc) => {
-      bookData = doc.data();
-    });
-
-    return await res.status(200).send(bookData);
+    return ApiResponse.OK(res, book);
   } catch (err) {
-    return await res.status(500).send({ message: "Error al traer los datos" });
+    return ApiResponse.InternalServerError(res);
   }
 };
 
-const getBookByUserOwner = async (req, res) => {
+const getBooksByUserOwner = async (req, res) => {
   const { uid } = req.params;
-  let bookData = [];
 
-  const db = getFirestore(app);
   try {
-    const q = query(collection(db, "book"), where("userId", "==", uid));
-    const data = await getDocs(q);
-    if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+    const book = await bookService.getBooksByUserOwner(uid);
 
-    data.forEach((doc) => {
-      bookData.push(doc.data());
-    });
+    if (book == null) return ApiResponse.NotContent(res);
 
-    return await res.status(200).send(bookData);
-  } catch (error) {
-    return res.status(500).send({ message: "Error al traer los datos" });
+    return ApiResponse.OK(res, book);
+  } catch (err) {
+    return ApiResponse.InternalServerError(res);
   }
 };
 
@@ -77,95 +51,53 @@ const getMyBooks = (req, res) => {
 
 const setBook = async (req, res) => {
   const bookData = req.body;
-  const uid = uuid();
-  const bookDetail = {...bookData, uid}
 
   try {
-    const serverRespose = await firestoreAdmin
-      .collection("book")
-      .doc(uid)
-      .create(bookDetail);
-    return res.status(200).send({ serverRespose });
+    const bookCreated = bookService.setBook(bookData);
+
+    return ApiResponse.Created(res, bookCreated);
   } catch (error) {
-    return res.status(500).send({ error });
+    return ApiResponse.InternalServerError(res);
   }
 };
 
 const getFeaturedBooks = async (req, res) => {
   const { amount } = req.params;
-  const dataResult = [];
-  const db = getFirestore(app);
-
   try {
-    const q = query(
-      collection(db, "book"),
-      orderBy("year", "desc"),
-      limit(amount)
-    );
-    const data = await getDocs(q);
-    if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+    const books = await bookService.getFeaturedBooks(amount);
 
-    data.forEach((doc) => dataResult.push(doc.data()));
+    if (books == null) return ApiResponse.NotContent(res);
 
-    return res.status(200).send(dataResult);
-  } catch (error) {
-    return res.status(500).send({ message: "Error al traer los datos" });
+    return ApiResponse.OK(res, books);
+  } catch (err) {
+    return ApiResponse.InternalServerError(res);
   }
 };
 
 const getRecentsBooks = async (req, res) => {
   const { amount } = req.params;
-  const dataResult = [];
-  const db = getFirestore(app);
-
   try {
-    const q = query(
-      collection(db, "book"),
-      orderBy("uploadDate", "desc"),
-      limit(amount)
-    );
-    const data = await getDocs(q);
+    const books = await bookService.getRecentsBooks(amount);
 
-    if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+    if (books == null) return ApiResponse.NotContent(res);
 
-    data.forEach((doc) => dataResult.push(doc.data()));
-
-    return res.status(200).send(dataResult);
-  } catch (error) {
-    return res.status(500).send({ message: "Error al traer los datos" });
+    return ApiResponse.OK(res, books);
+  } catch (err) {
+    return ApiResponse.InternalServerError(res);
   }
 };
 
 const getOthersBooks = async (req, res) => {
   const { amount } = req.params;
-  const dataResult = [];
-  const db = getFirestore(app);
-
   try {
-    const q = query(
-      collection(db, "book"),
-      orderBy("uploadDate", "asc"),
-      limit(amount)
-    );
+    const books = await bookService.getOthersBooks(amount);
 
-    const data = await getDocs(q);
-    if ((data.size = 0)) return res.status(204).send({ message: "No data" });
+    if (books == null) return ApiResponse.NotContent(res);
 
-    data.forEach((doc) => dataResult.push(doc.data()));
-
-    return res.status(200).send(dataResult);
-  } catch (error) {
-    return res.status(500).send({ message: "Error al traer los datos" });
+    return ApiResponse.OK(res, books);
+  } catch (err) {
+    return ApiResponse.InternalServerError(res);
   }
-};
-
-const getSearchResult = async (word) => {
-  const db = getFirestore(app);
-  const uid = params.split("=")[1];
-
-  const q = query(collection(db, "book"), where("userId", "==", uid));
-
-  return await getDocs(q);
 };
 
 const findBook = (req, res) => {
@@ -178,7 +110,7 @@ module.exports = {
   getFavouriteBooks,
   getMyBooks,
   setBook,
-  getBookByUserOwner,
+  getBooksByUserOwner,
   getRecentsBooks,
   getFeaturedBooks,
   getOthersBooks,

@@ -1,10 +1,12 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const express = require('express');
+const cors = require('cors');
 const bookRouter = require('./routes/book');
 const authRouter = require('./routes/auth');
 const userRouter = require('./routes/user');
+const transactionRouter = require('./routes/transaction');
+
 const app = express();
 
 app.use(cookieParser());
@@ -24,5 +26,6 @@ app.use((req, res, next) => {
 app.use('/api', bookRouter);
 app.use('/api', authRouter);
 app.use('/api', userRouter);
+app.use('/api', transactionRouter);
 
 module.exports = app;
