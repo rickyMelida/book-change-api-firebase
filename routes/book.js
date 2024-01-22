@@ -6,7 +6,7 @@ const {
   getFavouriteBooks,
   getMyBooks,
   setBook,
-  getBookByUserOwner,
+  getBooksByUserOwner,
   getRecentsBooks,
   getFeaturedBooks,
   getOthersBooks,
@@ -81,7 +81,7 @@ router.get("/book/:uid", getBook);
  *       500:
  *         description: Error en el servidor
  */
-router.get("/book/byUser/:uid", getBookByUserOwner);
+router.get("/book/byUser/:uid", getBooksByUserOwner);
 
 /**
  * @swagger

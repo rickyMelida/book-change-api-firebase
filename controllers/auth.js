@@ -1,159 +1,59 @@
-const { authAdmin, admin } = require("../services/firebase-admin-service");
-const { auth } = require("../services/firebase-service");
+const { subjectEmailVerification, bodyEmailVerification } = require("../utils/constantGenerics");
+const { authAdmin } = require("../services/firebase-admin-service");
+const { authService } = require("../services/auth.service");
+const { sendEmail, setCookie } = require("../utils/utils");
+const { ApiResponse } = require("../utils/responses");
 const path = require("path");
-const nodemailer = require("nodemailer");
-const {
-  signInWithEmailAndPassword,
-  getAuth,
-  signOut,
-  onAuthStateChanged,
-} = require("firebase/auth");
+
 require("dotenv").config({ path: path.join(process.cwd(), ".env") });
 
-const signUp = (req, res) => {
+const signUp = async (req, res) => {
   try {
-    const { email, password, displayName, photoURL, phoneNumber } = req.body;
-    auth.useDeviceLanguage();
-    authAdmin
-      .createUser({
-        email,
-        password,
-        displayName,
-        photoURL,
-        phoneNumber,
-      })
-      .then((rs) => {
-        authAdmin
-          .getUserByEmail(email)
-          .then((userRecord) => {
-            return authAdmin.generateEmailVerificationLink(userRecord.email);
-          })
-          .then((link) => {
-            const spanishLink = link.replace("lang=en", "lang=es");
-            const mailOptions = {
-              from: "bookchange.admin@gmail.com",
-              to: email,
-              subject: "Verificación de correo electrónico",
-              html: `
-                <div>
-                  <p>
-                    Gracias por registrarte! <br />
-                    <p style='margin-bottom: 2%;'>
-                      Tu cuenta ha sido creada, puedes iniciar sesión con lo siguiente
-                      credenciales después de haber activado su cuenta presionando la url
-                      abajo.
-                    </p>
-                    <hr>
-                      Username: ${email} <br>
-                      Password: ${password} <br>
-                    <hr>
-                  </p>
-                  <p>
-                    Haga clic en este enlace para activar su cuenta:
-                  </p>
-                  <a href='${spanishLink}'>Verificar Correo</a>
-                </div>
-              `,
-            };
+    const userInfo = req.body;
 
-            sendMailVerification(mailOptions)
-              .then((rm) => {
-                return res.status(200).send(rs);
-              })
-              .catch((err) => {
-                return res.status(500).send({
-                  message:
-                    "Hubo un error al enviar el correo de verificacion. Favor vuelva a intentar mas tarde.",
-                  err,
-                });
-              });
-          })
-          .catch((err) => {
-            return res.status(500).send({
-              message:
-                "Hubo un error al enviar el correo de verificacion. Favor vuelva a intentar mas tarde.",
-              err,
-            });
-          });
-      })
-      .catch((err) => {
-        return res.status(500).send({
-          message:
-            "Hubo un error al intentar registrarse. Favor vuelva a intentar mas tarde.",
-          err,
-        });
-      });
+    const userInfoResponse = await authService.signUp(userInfo);
+
+    await sendEmail(email, subjectEmailVerification, bodyEmailVerification(userInfoResponse));
+
+    return ApiResponse.OK(res);
   } catch (err) {
-    return res.status(500).send({ message: `${err}` });
+    return ApiResponse.InternalServerError(res, err);
   }
 };
 
-const signIn = (req, res) => {
-  const { email, password } = req.body;
+const signIn = async (req, res) => {
+  const userInfo = req.body;
 
-  if (email == null || password == null)
-    return res.status(400).send({ message: "Algunos campos estan vacios" });
-
-  signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      res.cookie("user-uid", userCredential.user.uid);
-      res.status(200).send(userCredential.user);
-    })
-    .catch((error) =>
-      res
-        .status(400)
-        .send({ error: error, message: "Email o Contraseña incorrecta" })
-    );
+  if (userInfo.email == null || userInfo.password == null)
+    return ApiResponse.BadRequest(res,"Algunos campos estan vacios");
+  
+  try {
+    const userCredential = await authService.signIn(userInfo);
+    setCookie(res, 'user-uid', userCredential.uid);
+    
+    return ApiResponse.OK(res, userCredential);
+  }catch(error) {
+    return ApiResponse.BadRequest(res, "Email o Contraseña incorrecta");
+  }
 };
 
-const sendMailVerification = async (message) => {
-  const config = {
-    host: "smtp.gmail.com",
-    port: 587,
-    auth: {
-      user: process.env.EMAIL_ADMIN,
-      pass: process.env.PASSWORD_ADMIN,
-    },
-  };
+const logOut = async (req, res) => {
+  try{
+    await authService.logOut();
 
-  const transport = nodemailer.createTransport(config);
-
-  return await transport.sendMail(message);
+    return ApiResponse.Ok(res);
+  }catch(err){
+    return ApiResponse.InternalServerError(res);
+  }  
 };
 
-const logOut = (req, res) => {
-  const authentication = getAuth();
-  signOut(authentication)
-    .then(() => {
-      res.status(200).send({ message: "Cierre de sesion exitoso." });
-    })
-    .catch((err) => {
-      res
-        .status(500)
-        .send({ message: "Hubo un error al intentar cerrar la sesion" });
-    });
-};
+const verifyAuth = async (token) => {
+  if(authService.isAuthenticated(token)){
+    const user = await authAdmin.verifyIdToken(token);
+    return user;
+  }
 
-const verifyAuth = async (uidRequest) => {
-  return new Promise((resolve, reject) => {
-    const unsuscribe = onAuthStateChanged(
-      auth,
-      (user) => {
-        try {
-          if (!user) resolve({ message: "Usuario no autenticado" });
-          const { uid } = user;
-          if (uid === uidRequest) resolve(user);
-          else resolve({ message: "Usuario no autenticado" });
-          unsuscribe();
-        } catch (err) {
-          resolve({ message: "Usuario no autenticado" });
-        }
-      },
-      (error) => {
-        reject(error);
-      }
-    );
-  });
+  return "Usuario no autenticado"
 };
 
 const isAuth = async (req, res) => {
@@ -161,9 +61,10 @@ const isAuth = async (req, res) => {
 
   try {
     const user = await verifyAuth(uid);
-    return res.status(200).send(user);
+    
+    return ApiResponse.OK(res, user);
   } catch (err) {
-    return res.status(500).send({ message: err });
+    return ApiResponse.InternalServerError(res, err);
   }
 };
 

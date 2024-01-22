@@ -1,4 +1,5 @@
 const { authAdmin } = require("../services/firebase-admin-service");
+
 const getUser = (req, res) => {
   const { uid } = req.params;
   authAdmin
