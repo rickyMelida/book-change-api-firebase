@@ -13,11 +13,11 @@ const signUp = async (req, res) => {
 
     const userInfoResponse = await authService.signUp(userInfo);
 
-    await sendEmail(email, subjectEmailVerification, bodyEmailVerification(userInfoResponse));
+    await sendEmail(userInfo.email, subjectEmailVerification, bodyEmailVerification(userInfoResponse));
 
     return ApiResponse.OK(res);
   } catch (err) {
-    return ApiResponse.InternalServerError(res, err);
+    return ApiResponse.InternalServerError(res, err.message);
   }
 };
 

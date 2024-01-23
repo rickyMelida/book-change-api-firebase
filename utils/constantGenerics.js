@@ -6,7 +6,7 @@ module.exports.subjectUserAlert = () => "¡Nuevo Interés de de tu libro!";
 module.exports.bodyEmailVerification = (info) => `
 <div><p>Gracias por registrarte!<br><p style=margin-bottom:2%>Tu cuenta ha sido creada, puedes iniciar sesión con lo siguiente credenciales después de haber activado su cuenta presionando la url abajo.<hr>Username: ${info.email}<br>Password: ********* <br><hr><p>Haga clic en este enlace para activar su cuenta:</p><a href=${info.spanishLinkVerification}>Verificar Correo</a></div>`;
 
-module.exports.subjectEmailVerification = ()=> 'Verificación de correo electrónico';
+module.exports.subjectEmailVerification = 'Verificación de correo electrónico';
 /**
  * bookName
  * bookOwner
