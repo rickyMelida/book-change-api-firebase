@@ -1,4 +1,4 @@
-const { firestoreAdmin } = require("../services/firebase-admin-service");
+const { firestoreAdmin } = require("./firebase-admin-service");
 const { v4: uuid } = require("uuid");
 
 module.exports.bookService = {
@@ -99,12 +99,12 @@ module.exports.bookService = {
   getRecentsBooks: async (amount) => {
     try {
       const querySnapshot = await firestoreAdmin
-        .collection("book")
-        .orderBy("uploadDate", "desc")
-        .limit(amount);
-
+      .collection("book")
+      .orderBy("uploadDate", "desc")
+      .limit(parseInt(amount));
+      
       if (querySnapshot.empty) return null;
-
+      
       return querySnapshot.docs[0].data();
     } catch (err) {
       return err;
