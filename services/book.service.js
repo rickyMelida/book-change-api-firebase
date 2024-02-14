@@ -86,11 +86,13 @@ module.exports.bookService = {
       const querySnapshot = await firestoreAdmin
         .collection("book")
         .orderBy("year", "desc")
-        .limit(amount);
+        .limit(parseInt(amount))
+        .get();
 
       if (querySnapshot.empty) return null;
 
-      return querySnapshot.docs[0].data();
+      return await querySnapshot.docs.map(doc => doc.data());
+
     } catch (err) {
       return err;
     }
@@ -99,13 +101,14 @@ module.exports.bookService = {
   getRecentsBooks: async (amount) => {
     try {
       const querySnapshot = await firestoreAdmin
-      .collection("book")
-      .orderBy("uploadDate", "desc")
-      .limit(parseInt(amount));
-      
+        .collection("book")
+        .orderBy("uploadDate", "desc")
+        .limit(parseInt(amount))
+        .get();
+
       if (querySnapshot.empty) return null;
-      
-      return querySnapshot.docs[0].data();
+
+      return await querySnapshot.docs.map(doc => doc.data());
     } catch (err) {
       return err;
     }
@@ -116,11 +119,12 @@ module.exports.bookService = {
       const querySnapshot = await firestoreAdmin
         .collection("book")
         .orderBy("uploadDate", "asc")
-        .limit(amount);
+        .limit(parseInt(amount))
+        .get();
 
       if (querySnapshot.empty) return null;
 
-      return querySnapshot.docs[0].data();
+      return await querySnapshot.docs.map(doc => doc.data());
     } catch (err) {
       return err;
     }
