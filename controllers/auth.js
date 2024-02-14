@@ -15,7 +15,7 @@ const signUp = async (req, res) => {
 
     await sendEmail(userInfo.email, subjectEmailVerification, bodyEmailVerification(userInfoResponse));
 
-    return ApiResponse.OK(res);
+    return ApiResponse.Created(userInfoResponse);
   } catch (err) {
     return ApiResponse.InternalServerError(res, err.message);
   }
