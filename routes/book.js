@@ -11,6 +11,7 @@ const {
   getFeaturedBooks,
   getOthersBooks,
   findBook,
+  setFavorite
 } = require("../controllers/book");
 
 const multipart = require("connect-multiparty");
@@ -231,5 +232,30 @@ router.get("/book/getOthersBooks/:amount", getOthersBooks);
  *         description: Error en el servidor
  */
 router.post("/book/find", findBook);
+
+/**
+ * @swagger
+ * /api/book/setFavourite:
+ *   post:
+ *     tags: [Libros]
+ *     parameters:
+ *     - book-id: Id del libro 
+ *       description: Id del libro a ser marcado como favorito
+ *       required: true
+ *       type: string
+ *     - user-id: Id del usuario
+ *       description: Id del usuario que marco el libro como favorito
+ *       required: true
+ *       type: string
+ *     description: Marcamos un libro como favorito
+ *     responses:
+ *       201:
+ *         description: Libro Marcado como Favorito 
+ *       404:
+ *         description: Libro o Usuario no encontrado
+ *       500:
+ *         description: Error en el servidor
+ */
+router.post("/book/setFavourite", setFavorite);
 
 module.exports = router;

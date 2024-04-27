@@ -1,4 +1,4 @@
-const { firestoreAdmin } = require("./firebase-admin-service");
+const { firestoreAdmin, admin } = require("./firebase-admin-service");
 const { v4: uuid } = require("uuid");
 
 module.exports.bookService = {
@@ -91,8 +91,7 @@ module.exports.bookService = {
 
       if (querySnapshot.empty) return null;
 
-      return await querySnapshot.docs.map(doc => doc.data());
-
+      return await querySnapshot.docs.map((doc) => doc.data());
     } catch (err) {
       return err;
     }
@@ -108,7 +107,7 @@ module.exports.bookService = {
 
       if (querySnapshot.empty) return null;
 
-      return await querySnapshot.docs.map(doc => doc.data());
+      return await querySnapshot.docs.map((doc) => doc.data());
     } catch (err) {
       return err;
     }
@@ -124,9 +123,24 @@ module.exports.bookService = {
 
       if (querySnapshot.empty) return null;
 
-      return await querySnapshot.docs.map(doc => doc.data());
+      return await querySnapshot.docs.map((doc) => doc.data());
     } catch (err) {
       return err;
+    }
+  },
+
+  setFavorite: async (bookId, userId) => {
+    try {
+      const serverRespose = await firestoreAdmin
+        .collection("book")
+        .doc(bookId)
+        .update({
+          userInterested: admin.firestore.FieldValue.arrayUnion(userId),
+        });
+
+      return serverRespose;
+    } catch (error) {
+      return error;
     }
   },
 };

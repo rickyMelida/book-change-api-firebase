@@ -104,6 +104,13 @@ const findBook = (req, res) => {
   return { message: "findBook Controller" };
 };
 
+const setFavorite = async (req, res) => {
+  const { bookId, userId } = req.body;
+  const bookModified = bookService.setFavorite(bookId, userId);
+
+  return ApiResponse.Created(res, bookModified);
+};
+
 module.exports = {
   getBooks,
   getBook,
@@ -115,4 +122,5 @@ module.exports = {
   getFeaturedBooks,
   getOthersBooks,
   findBook,
+  setFavorite,
 };
