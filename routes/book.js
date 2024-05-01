@@ -11,7 +11,8 @@ const {
   getFeaturedBooks,
   getOthersBooks,
   findBook,
-  setFavorite
+  setFavorite,
+  removeAsFavorite
 } = require("../controllers/book");
 
 const multipart = require("connect-multiparty");
@@ -257,5 +258,30 @@ router.post("/book/find", findBook);
  *         description: Error en el servidor
  */
 router.post("/book/setFavourite", setFavorite);
+
+/**
+ * @swagger
+ * /api/book/setFavourite:
+ *   post:
+ *     tags: [Libros]
+ *     parameters:
+ *     - book-id: Id del libro 
+ *       description: Id del libro a ser eliminado como favorito
+ *       required: true
+ *       type: string
+ *     - user-id: Id del usuario
+ *       description: Id del usuario que desea eliminar el libro como favorito
+ *       required: true
+ *       type: string
+ *     description: Eliminamos un libro como favorito
+ *     responses:
+ *       200:
+ *         description: Libro Marcado como Favorito 
+ *       404:
+ *         description: Libro o Usuario no encontrado
+ *       500:
+ *         description: Error en el servidor
+ */
+router.delete("/book/removeFavourite/:bookId/:userId", removeAsFavorite)
 
 module.exports = router;

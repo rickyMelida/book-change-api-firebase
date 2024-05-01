@@ -143,4 +143,19 @@ module.exports.bookService = {
       return error;
     }
   },
+
+  removeFavorite: async (bookId, userId) => {
+    try {
+      const serverRespose = await firestoreAdmin
+        .collection("book")
+        .doc(bookId)
+        .update({
+          userInterested: admin.firestore.FieldValue.arrayRemove(userId),
+        });
+        
+      return serverRespose;
+    } catch (error) {
+      return error;
+    }
+  },
 };

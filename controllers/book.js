@@ -106,9 +106,25 @@ const findBook = (req, res) => {
 
 const setFavorite = async (req, res) => {
   const { bookId, userId } = req.body;
-  const bookModified = bookService.setFavorite(bookId, userId);
+  try {
+    const bookModified = bookService.setFavorite(bookId, userId);
 
-  return ApiResponse.Created(res, bookModified);
+    return ApiResponse.Created(res, bookModified);
+  } catch (error) {
+    return ApiResponse.BadRequest(res, bookId);
+  }
+};
+
+const removeAsFavorite = async (req, res) => {
+  const { bookId, userId } = req.params;
+  try {
+    const userInterestedDeleted = bookService.removeFavorite(bookId, userId);
+
+    return ApiResponse.OK(res, userInterestedDeleted);
+  } catch (error) {
+    return ApiResponse.BadRequest(error);
+  }
+
 };
 
 module.exports = {
@@ -123,4 +139,5 @@ module.exports = {
   getOthersBooks,
   findBook,
   setFavorite,
+  removeAsFavorite
 };
