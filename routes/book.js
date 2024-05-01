@@ -261,8 +261,8 @@ router.post("/book/setFavourite", setFavorite);
 
 /**
  * @swagger
- * /api/book/setFavourite:
- *   post:
+ * /api/book/removeFavourite/{bookId}/{userId}:
+ *   delete:
  *     tags: [Libros]
  *     parameters:
  *     - book-id: Id del libro 
